@@ -1,10 +1,10 @@
 # Following tutorial on youtube by 'Barry Peddycord III'
 
+from . import gfx
 import curses
 import sys
 import traceback
 
-stdscr = None
 
 # Single instance of a game.  Maps, data, etc.
 class Game(object):
@@ -17,7 +17,7 @@ class Game(object):
 		x,y = 0,0
 
 		while running:
-			c = stdscr.getch()
+			c = gfx.scr().getch()
 
 			if c == curses.KEY_UP:
 				y -= 1
@@ -31,42 +31,26 @@ class Game(object):
 				running = False
 
 			if c != -1:	
-				stdscr.clear()
-				stdscr.addch(y,x,'@')
+				gfx.scr().clear()
+				gfx.scr().addch(y,x,'@')
 
 
 	# runs an interactive seesion of our game with the player.
 	def play(self):
 
 		#init
-		global stdscr
-		stdscr = curses.initscr()
-		curses.noecho()
-		curses.cbreak()
-		curses.curs_set(0)
-		stdscr.keypad(1)
-		stdscr.timeout(0)
+		gfx.start()
 
 		try:
 			self.step()
 			
 		except:
-			curses.nocbreak()
-			stdscr.timeout(0)
-			stdscr.keypad(0)
-			curses.echo()
-			curses.endwin()
-
+			gfx.stop()
 			print(traceback.format_exc())
 			sys.exit(-1)
 		
 		#cleanup
-		curses.nocbreak()
-		curses.curs_set(1)
-		stdscr.timeout(0)
-		stdscr.keypad(0)
-		curses.echo()
-		curses.endwin()
+		gfx.stop()
 			
 
 	
